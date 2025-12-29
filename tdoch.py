@@ -8,10 +8,9 @@ from tdochCortex import tdochCortex
 
 def binSpace(pars):
     """
-    Replicates the MATLAB binSpace function:
-        lagMin = 1000 / pars.freqInterval[1]
-        lagMax = 1000 / pars.freqInterval[0]
-        lagSpace = np.linspace(lagMax, lagMin, pars.N)
+    Generate a lag space array based on the frequency interval and number of bins in the parameters.
+    The lag space is defined from the maximum lag (corresponding to the minimum frequency) to the minimum lag (corresponding to the maximum frequency),
+    with the number of points specified by pars.N.
     """
     lagMin = 1000. / pars.freqInterval[1]
     lagMax = 1000. / pars.freqInterval[0]
