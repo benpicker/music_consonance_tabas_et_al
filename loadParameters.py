@@ -5,48 +5,30 @@ class Parameters:
     pass
 
 def plot_connectivities(lagSpace, Cei, Cii, Cie, Cee):
-    fig, axs = plt.subplots(2, 2, figsize=(8, 8))
+    # Increased figsize to accommodate the colorbar better
+    fig, axs = plt.subplots(2, 2, figsize=(10, 8)) 
 
-    im1 = axs[0, 0].imshow(
-        Cei,
-        extent=[lagSpace[0], lagSpace[-1], lagSpace[-1], lagSpace[0]],
-        vmin=0, vmax=1,
-        aspect='auto'
-    )
-    axs[0, 0].set_title("Cei")
-
-    im2 = axs[0, 1].imshow(
-        Cii,
-        extent=[lagSpace[0], lagSpace[-1], lagSpace[-1], lagSpace[0]],
-        vmin=0, vmax=1,
-        aspect='auto'
-    )
-    axs[0, 1].set_title("Cii")
-
-    im3 = axs[1, 0].imshow(
-        Cie,
-        extent=[lagSpace[0], lagSpace[-1], lagSpace[-1], lagSpace[0]],
-        vmin=0, vmax=1,
-        aspect='auto'
-    )
-    axs[1, 0].set_title("Cie")
-
-    im4 = axs[1, 1].imshow(
-        Cee,
-        extent=[lagSpace[0], lagSpace[-1], lagSpace[-1], lagSpace[0]],
-        vmin=0, vmax=1,
-        aspect='auto'
-    )
-    axs[1, 1].set_title("Cee")
-
-    # Single shared colorbar
-    fig.colorbar(im1, ax=axs, shrink=0.9)
-
-    for ax in axs.flat:
+    # Plotting loop to reduce redundancy
+    titles = ["Cei", "Cii", "Cie", "Cee"]
+    data = [Cei, Cii, Cie, Cee]
+    
+    for i, ax in enumerate(axs.flat):
+        im = ax.imshow(
+            data[i],
+            extent=[lagSpace[0], lagSpace[-1], lagSpace[-1], lagSpace[0]],
+            vmin=0, vmax=1,
+            aspect='auto',
+            cmap='viridis' # Explicitly setting cmap for clarity
+        )
+        ax.set_title(titles[i])
         ax.set_xlabel("lag (ms)")
         ax.set_ylabel("lag (ms)")
 
-    plt.tight_layout()
+    # Fix: Use 'right' location and constrained_layout or specific padding
+    fig.subplots_adjust(right=0.85) # Make room on the right
+    cbar_ax = fig.add_axes([0.88, 0.15, 0.03, 0.7]) # [left, bottom, width, height]
+    fig.colorbar(im, cax=cbar_ax)
+
     plt.show()
 
 def defineStimulus():
@@ -246,5 +228,3 @@ def loadParameters():
     pars.di    = 0.087      # inhib. non-linearity pars [Wong 2006]
 
     return pars
-
-loadParameters()
