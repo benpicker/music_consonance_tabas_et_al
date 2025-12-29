@@ -1,7 +1,53 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 class Parameters:
     pass
+
+def plot_connectivities(lagSpace, Cei, Cii, Cie, Cee):
+    fig, axs = plt.subplots(2, 2, figsize=(8, 8))
+
+    im1 = axs[0, 0].imshow(
+        Cei,
+        extent=[lagSpace[0], lagSpace[-1], lagSpace[-1], lagSpace[0]],
+        vmin=0, vmax=1,
+        aspect='auto'
+    )
+    axs[0, 0].set_title("Cei")
+
+    im2 = axs[0, 1].imshow(
+        Cii,
+        extent=[lagSpace[0], lagSpace[-1], lagSpace[-1], lagSpace[0]],
+        vmin=0, vmax=1,
+        aspect='auto'
+    )
+    axs[0, 1].set_title("Cii")
+
+    im3 = axs[1, 0].imshow(
+        Cie,
+        extent=[lagSpace[0], lagSpace[-1], lagSpace[-1], lagSpace[0]],
+        vmin=0, vmax=1,
+        aspect='auto'
+    )
+    axs[1, 0].set_title("Cie")
+
+    im4 = axs[1, 1].imshow(
+        Cee,
+        extent=[lagSpace[0], lagSpace[-1], lagSpace[-1], lagSpace[0]],
+        vmin=0, vmax=1,
+        aspect='auto'
+    )
+    axs[1, 1].set_title("Cee")
+
+    # Single shared colorbar
+    fig.colorbar(im1, ax=axs, shrink=0.9)
+
+    for ax in axs.flat:
+        ax.set_xlabel("lag (ms)")
+        ax.set_ylabel("lag (ms)")
+
+    plt.tight_layout()
+    plt.show()
 
 def defineStimulus():
     est = Parameters()
@@ -84,7 +130,6 @@ def connectivities(pars):
     Cqee = np.eye(pars.N)
     Cpq  = np.eye(pars.N)
 
-
     pars.Cee = Cee
     pars.Cei = Cei
     pars.Cie = Cie
@@ -94,6 +139,9 @@ def connectivities(pars):
     pars.Cqie = Cqie
     pars.Cqii = Cqii
 
+    if True:
+        plot_connectivities(lagSpace, Cei, Cii, Cie, Cee)
+  
     return pars
 
 def loadParameters():
@@ -198,3 +246,5 @@ def loadParameters():
     pars.di    = 0.087      # inhib. non-linearity pars [Wong 2006]
 
     return pars
+
+loadParameters()
