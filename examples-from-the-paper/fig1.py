@@ -1,178 +1,101 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Minimal working loadParameters for demo/testing
-# Replace with your actual parameter loading logic as needed
 def loadParameters():
+    # Replace with your actual parameter loading logic
     return {
-        'subDelayDy': 10,
-        'subDelay': 5,
         'est': {
             'dur': 200,
-            'type': 'IRNchordSS',
+            'type': 'IRN',
             'f': 160,
             'nOfIts': 16,
-            'noiseOff' : 0,
-            'bandpass': [125, 2000],
+            'noiseOff': 0,
+            'bandpass': [800, 3200],
             'tuning': 'just',
             'notes': []
-        }
+        },
+        'sigma': 0,
+        'Cei': np.ones((30, 30)) * 0.5,  # Dummy connectivity, replace as needed
+        'Cie': np.ones((30, 30)) * 0.5
     }
 
-# Minimal working tdoch for demo/testing
-# Replace with your actual tdoch logic as needed
 def tdoch(pars):
-    # Dummy shapes for testing
+    # Dummy implementation for demonstration
     s = {
-        'p': {'He': np.zeros((200, 30)), 'Hi': np.zeros((200, 30))},
-        'q': {'He': np.zeros((200, 30)), 'Hi': np.zeros((200, 30))}
+        'p': {'He': np.random.rand(300, 30)},
+        'q': {'He': np.random.rand(300, 30)}
     }
-    r = {'A': np.zeros((200, 30))}
+    r = {'A': np.random.rand(300, 30)}
     lagSpace = np.linspace(1, 30, 30)
-    timeSpace = np.linspace(0, 1, 200)
+    timeSpace = np.linspace(0, 300, 300)
     return s, r, lagSpace, timeSpace
 
-N = 60
-notes = np.arange(0, 13, 1)
-dyads = ['unison', 'minor second', 'second', 'minor third',
-         'third', 'fourth', 'tritone', 'perfect fifth',
-         'minor sixth', 'sixth', 'minor seventh', 'seventh', 'octave']
-its = 8
-dur = 200
-f0 = 160
-bandpass = [125, 2000]
-tuning = 'just'
-stimType = 'IRNchordSS'
+# Fig 1 -- Model's diagram
+delays = np.arange(4, 13, 4)  # [4, 8, 12]
 
-parbase = loadParameters()
-onset = np.full(notes.shape, parbase['subDelayDy'])
-onset[0] = parbase['subDelay']
-parbase['subDelayDy'] = 0
-parbase['subDelay'] = 0
-parbase['est']['dur'] = dur
-parbase['est']['type'] = stimType
-parbase['est']['f'] = f0
-parbase['est']['nOfIts'] = its
-parbase['est']['bandpass'] = bandpass
-parbase['est']['tuning'] = tuning
+pars = loadParameters()
+pars['est']['dur'] = 300
+pars['est']['type'] = 'IRN'
+pars['est']['nOfIts'] = 16
+pars['est']['noiseOff'] = 0
+pars['est']['bandpass'] = [800, 3200]
+pars['sigma'] = 0  # No cortical noise for the examples -> clearer plots
 
-pars = []
-for i in range(len(notes)):
-    p = parbase.copy()
-    p['est']['notes'] = [0, notes[i]]
-    pars.append(p)
+He = []
+Ac = []
+por = []
 
-# Run tdoch for the first set of parameters to get lagSpace and timeSpace
-_, r, lagSpace, timeSpace = tdoch(pars[0])
+for i, delay in enumerate(delays):
+    print(i + 1)
+    pars['est']['f'] = 1000.0 / delay
+    s, r, lagSpace, timeSpace = tdoch(pars)
+    He.append(np.mean(s['q']['He'][250:], axis=0))
+    Ac.append(np.mean(r['A'][250:], axis=0))
+    por.append(np.mean(s['p']['He'], axis=1))
 
-ACPar = []
-DePar = []
-DiPar = []
-SePar = []
-SiPar = []
-latPar = []
+por = np.stack(por, axis=1)
 
-for i in range(len(notes)):
-    print(f' - {i+1} of {len(notes)} ...')
-    ac = []
-    de = []
-    di = []
-    se = []
-    si = []
-    lat = []
-    for n in range(N):
-        s, r = tdoch(pars[i])
-        ac.append(np.mean(r['A'][175:200, :], axis=0))
-        de.append(np.mean(s['p']['He'][175:200, :], axis=0))
-        di.append(np.mean(s['p']['Hi'][175:200, :], axis=0))
-        se.append(np.mean(s['q']['He'][175:200, :], axis=0))
-        si.append(np.mean(s['q']['Hi'][175:200, :], axis=0))
-        lat.append(np.argmax(np.mean(s['p']['He'], axis=1)))
-    ACPar.append(np.array(ac))
-    DePar.append(np.array(de))
-    DiPar.append(np.array(di))
-    SePar.append(np.array(se))
-    SiPar.append(np.array(si))
-    latPar.append(np.array(lat))
-    print('done!')
+fig0, axs0 = plt.subplots(1, len(delays), figsize=(20, 2))
+l = [4.1, 3.1, 2.9]
+for i in range(len(delays)):
+    axs0[i].plot(np.arange(1, por.shape[0] + 1), por[:, i], 'k')
+    axs0[i].set_ylabel('excitatory activity in the decoder network (Hz)')
+    axs0[i].set_xlabel('time after tone onset (ms)')
+    axs0[i].set_xlim([0, 300])
+    axs0[i].set_ylim([0, l[i]])
+    axs0[i].invert_yaxis()
+fig0.tight_layout()
+fig0.savefig('fig1-0.svg', format='svg')
+plt.close(fig0)
 
-ACMat = np.stack(ACPar, axis=2)
-DeMat = np.stack(DePar, axis=2)
-DiMat = np.stack(DiPar, axis=2)
-SeMat = np.stack(SePar, axis=2)
-SiMat = np.stack(SiPar, axis=2)
-lat0 = np.stack(latPar, axis=1)
+fig, axs = plt.subplots(4, 3, figsize=(8, 11))
+for i in range(len(delays)):
+    ax = axs[i // 3, i % 3]
+    ax.plot(lagSpace, He[i], 'k')
+    ax.set_title(f'perceived pitch: {1000 / delays[i]:.0f}ms')
+    ax.set_xlabel('characteristic period of the population (ms)')
+    ax.set_ylabel('average firing rate (Hz)')
+    ax.set_xlim([0, 30])
+    ax.set_ylim([0, 80])
 
-# Psychoacoustics
-fig1 = plt.figure(figsize=(10, 6))
+im1 = axs[1, 2].imshow(pars['Cei'], extent=[lagSpace[0], lagSpace[-1], lagSpace[0], lagSpace[-1]], aspect='auto', cmap='viridis', vmin=0, vmax=1)
+axs[1, 2].set_title('decoder exc-to-inh')
+axs[1, 2].set_xticks(np.arange(5, 31, 5))
+fig.colorbar(im1, ax=axs[1, 2])
 
-AC = np.mean(ACMat, axis=2)
-De = np.mean(DeMat, axis=2)
-Di = np.mean(DiMat, axis=2)
-Se = np.mean(SeMat, axis=2)
-Si = np.mean(SiMat, axis=2)
+im2 = axs[2, 2].imshow(pars['Cie'], extent=[lagSpace[0], lagSpace[-1], lagSpace[0], lagSpace[-1]], aspect='auto', cmap='viridis', vmin=0, vmax=1)
+axs[2, 2].set_title('decoder inh-to-exc')
+axs[2, 2].set_xticks(np.arange(5, 31, 5))
+fig.colorbar(im2, ax=axs[2, 2])
 
-maximum = 25 * np.ceil(np.max([De, Di, Se]) / 25)
+for i in range(len(delays)):
+    ax = axs[3, i]
+    ax.plot(lagSpace, Ac[i], 'k')
+    ax.set_xlabel('characteristic period of the population (ms)')
+    ax.set_ylabel('average firing rate (Hz)')
+    ax.set_xlim([0, 30])
+    ax.set_ylim([0, 80])
 
-plt.subplot(2, 3, 1)
-plt.imshow(AC, aspect='auto', extent=[lagSpace[0], lagSpace[-1], notes[0], notes[-1]])
-plt.xlabel('regularised SACF characteristic delay (ms)')
-plt.ylabel('stimulus period (ms)')
-plt.clim(0, maximum)
-plt.title('AC')
-
-plt.subplot(2, 3, 2)
-plt.imshow(De, aspect='auto', extent=[lagSpace[0], lagSpace[-1], notes[0], notes[-1]])
-plt.xlabel('decoder excitatory characteristic delay (ms)')
-plt.ylabel('stimulus period (ms)')
-plt.clim(0, maximum)
-plt.title('De')
-
-plt.subplot(2, 3, 3)
-plt.imshow(Di, aspect='auto', extent=[lagSpace[0], lagSpace[-1], notes[0], notes[-1]])
-plt.xlabel('decoder inhibitory characteristic delay (ms)')
-plt.ylabel('stimulus period (ms)')
-plt.clim(0, maximum)
-plt.title('Di')
-
-plt.subplot(2, 3, 4)
-plt.imshow(Se, aspect='auto', extent=[lagSpace[0], lagSpace[-1], notes[0], notes[-1]])
-plt.xlabel('sustainer excitatory characteristic delay (ms)')
-plt.ylabel('stimulus period (ms)')
-plt.clim(0, maximum)
-plt.title('Se')
-
-plt.subplot(2, 3, 5)
-im = plt.imshow(Si, aspect='auto', extent=[lagSpace[0], lagSpace[-1], notes[0], notes[-1]])
-plt.clim(0, maximum)
-plt.colorbar(im, label='average population activity (Hz)')
-plt.title('Si')
-
-plt.tight_layout()
-plt.savefig('fig5-0.svg', format='svg')
-
-# POR predictions
-fig2 = plt.figure()
-
-lat = lat0 + onset[:, np.newaxis]
-latAvg = np.mean(lat, axis=1)
-latErr = np.std(lat, axis=1) / np.sqrt(N)
-
-# MEG fields
-# You will need to implement the loading of aefs and n1Lats from .mat files
-# datapath = '~/Cloud/Projects/TDoCh/Doc/figs/data/'
-# aefs = scipy.io.loadmat(datapath + 'aefRes.mat')
-# n1Lats = scipy.io.loadmat(datapath + 'n1Lat.mat')
-# eLat = n1Lats['n1Lat']
-# eNotes = aefs['notes']
-# eLatAvg = aefs['n1LatAvg']
-# eLatErr = aefs['n1LatErr']
-
-plt.subplot(1, 2, 1)
-# plt.errorbar(eNotes, latAvg[eNotes+1], yerr=latErr[eNotes+1])
-# plt.errorbar(eNotes, eLatAvg, yerr=eLatErr)
-plt.xlabel('notes')
-plt.ylabel('latency (ms)')
-plt.title('POR predictions')
-
-plt.show()
+fig.tight_layout()
+fig.savefig('fig1-1.svg', format='svg')
+plt.close(fig)
