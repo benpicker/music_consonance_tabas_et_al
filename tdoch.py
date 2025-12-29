@@ -7,10 +7,16 @@ from loadParameters import loadParameters
 from tdochCortex import tdochCortex
 
 def binSpace(pars):
-    # Placeholder: implement binSpace logic as in MATLAB
-    # This should return the lagSpace array
-    # For now, return a dummy array
-    return np.linspace(1, 15, 15)
+    """
+    Replicates the MATLAB binSpace function:
+        lagMin = 1000 / pars.freqInterval[1]
+        lagMax = 1000 / pars.freqInterval[0]
+        lagSpace = np.linspace(lagMax, lagMin, pars.N)
+    """
+    lagMin = 1000. / pars.freqInterval[1]
+    lagMax = 1000. / pars.freqInterval[0]
+    lagSpace = np.linspace(lagMax, lagMin, pars.N)
+    return lagSpace
 
 def parseThalamic(parsing):
     pyparse = scipy.io.loadmat(parsing)
