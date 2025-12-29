@@ -1,10 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from typing import Any, List
 
 class Parameters:
     pass
 
-def plot_connectivities(lagSpace, Cei, Cii, Cie, Cee):
+def plot_connectivities(lagSpace: np.ndarray, Cei: np.ndarray, Cii: np.ndarray, Cie: np.ndarray, Cee: np.ndarray) -> None:
     # Increased figsize to accommodate the colorbar better
     fig, axs = plt.subplots(2, 2, figsize=(10, 8)) 
 
@@ -31,7 +32,7 @@ def plot_connectivities(lagSpace, Cei, Cii, Cie, Cee):
 
     plt.show()
 
-def defineStimulus():
+def defineStimulus() -> Parameters:
     est = Parameters()
     # estimulus parameters 
     est.filename = -1    # path to wav file (-1 to generate the stimulus)
@@ -65,7 +66,7 @@ def defineStimulus():
     est.save      = 1       # 1 for saving the stimulus .wav, 0 otherwise
     return est
 
-def connectivities(pars):
+def connectivities(pars: Parameters) -> Parameters:
     # 0. Generating lagSpace
     lagMin = 1000 / pars.freqInterval[1]
     lagMax = 1000 / pars.freqInterval[0]
@@ -126,7 +127,7 @@ def connectivities(pars):
   
     return pars
 
-def loadParameters():
+def loadParameters() -> Parameters:
     pars = Parameters()
 
     # use the estimulus function to define the stimulus parameters
