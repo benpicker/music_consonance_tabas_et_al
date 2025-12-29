@@ -6,6 +6,36 @@ import random
 from loadParameters import loadParameters
 from tdochCortex import tdochCortex
 
+def binSpace(pars):
+    # Placeholder: implement binSpace logic as in MATLAB
+    # This should return the lagSpace array
+    # For now, return a dummy array
+    return np.linspace(1, 15, 15)
+
+def parseThalamic(parsing):
+    pyparse = scipy.io.loadmat(parsing)
+    timeSpace = pyparse['timeSpace'].squeeze()
+    A = pyparse['A']
+    n = pyparse['n']
+    b = pyparse['b']
+    return timeSpace, A, n, b
+
+def pyThalamic(lagSpace, pars):
+    # parse filename is randomized to allow parallel computations
+    chart = string.ascii_letters + string.digits
+    parseID = 'pyparse' + ''.join(random.choices(chart, k=4))
+    parseIn = parseID + 'In.mat'
+    parseOut = parseID + 'Out.mat'
+    scipy.io.savemat(parseIn, {'pars': pars, 'lagSpace': lagSpace})
+
+    # You may need to adjust the python command for your system
+    python_cmd = 'python'
+    os.system(f'{python_cmd} subthalamic.py {parseID}')
+
+    timeSpace, A, n, b = parseThalamic(parseOut)
+    os.remove(parseOut)
+    return timeSpace, A, n, b
+
 def tdoch(pars=None, parsing=0):
     """
     Python version of tdoch.m
@@ -38,32 +68,4 @@ def tdoch(pars=None, parsing=0):
 
     return s, r, r['lagSpace'], r['timeSpace']
 
-def pyThalamic(lagSpace, pars):
-    # parse filename is randomized to allow parallel computations
-    chart = string.ascii_letters + string.digits
-    parseID = 'pyparse' + ''.join(random.choices(chart, k=4))
-    parseIn = parseID + 'In.mat'
-    parseOut = parseID + 'Out.mat'
-    scipy.io.savemat(parseIn, {'pars': pars, 'lagSpace': lagSpace})
 
-    # You may need to adjust the python command for your system
-    python_cmd = 'python'
-    os.system(f'{python_cmd} subthalamic.py {parseID}')
-
-    timeSpace, A, n, b = parseThalamic(parseOut)
-    os.remove(parseOut)
-    return timeSpace, A, n, b
-
-def parseThalamic(parsing):
-    pyparse = scipy.io.loadmat(parsing)
-    timeSpace = pyparse['timeSpace'].squeeze()
-    A = pyparse['A']
-    n = pyparse['n']
-    b = pyparse['b']
-    return timeSpace, A, n, b
-
-def binSpace(pars):
-    # Placeholder: implement binSpace logic as in MATLAB
-    # This should return the lagSpace array
-    # For now, return a dummy array
-    return np.linspace(1, 15, 15)
