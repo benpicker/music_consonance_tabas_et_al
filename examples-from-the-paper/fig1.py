@@ -5,7 +5,7 @@ def loadParameters():
     # Replace with your actual parameter loading logic
     return {
         'est': {
-            'dur': 200,
+            'dur': 300,
             'type': 'IRN',
             'f': 160,
             'nOfIts': 16,

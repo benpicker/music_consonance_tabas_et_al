@@ -7,44 +7,32 @@ class Parameters:
 def plot_connectivities(lagSpace, Cei, Cii, Cie, Cee):
     fig, axs = plt.subplots(2, 2, figsize=(8, 8))
 
-    im1 = axs[0, 0].imshow(
-        Cei,
-        extent=[lagSpace[0], lagSpace[-1], lagSpace[-1], lagSpace[0]],
-        vmin=0, vmax=1,
-        aspect='auto'
-    )
+    im1 = axs[0, 0].imshow(Cei, extent=[lagSpace[0], lagSpace[-1],
+                                       lagSpace[-1], lagSpace[0]],
+                           vmin=0, vmax=1, aspect='auto')
     axs[0, 0].set_title("Cei")
 
-    im2 = axs[0, 1].imshow(
-        Cii,
-        extent=[lagSpace[0], lagSpace[-1], lagSpace[-1], lagSpace[0]],
-        vmin=0, vmax=1,
-        aspect='auto'
-    )
+    im2 = axs[0, 1].imshow(Cii, extent=[lagSpace[0], lagSpace[-1],
+                                       lagSpace[-1], lagSpace[0]],
+                           vmin=0, vmax=1, aspect='auto')
     axs[0, 1].set_title("Cii")
 
-    im3 = axs[1, 0].imshow(
-        Cie,
-        extent=[lagSpace[0], lagSpace[-1], lagSpace[-1], lagSpace[0]],
-        vmin=0, vmax=1,
-        aspect='auto'
-    )
+    im3 = axs[1, 0].imshow(Cie, extent=[lagSpace[0], lagSpace[-1],
+                                       lagSpace[-1], lagSpace[0]],
+                           vmin=0, vmax=1, aspect='auto')
     axs[1, 0].set_title("Cie")
 
-    im4 = axs[1, 1].imshow(
-        Cee,
-        extent=[lagSpace[0], lagSpace[-1], lagSpace[-1], lagSpace[0]],
-        vmin=0, vmax=1,
-        aspect='auto'
-    )
+    im4 = axs[1, 1].imshow(Cee, extent=[lagSpace[0], lagSpace[-1],
+                                       lagSpace[-1], lagSpace[0]],
+                           vmin=0, vmax=1, aspect='auto')
     axs[1, 1].set_title("Cee")
-
-    # Single shared colorbar
-    fig.colorbar(im1, ax=axs, shrink=0.9)
 
     for ax in axs.flat:
         ax.set_xlabel("lag (ms)")
         ax.set_ylabel("lag (ms)")
+
+    # Colorbar outside plots
+    fig.colorbar(im1, ax=axs, location="right", fraction=0.046, pad=0.04)
 
     plt.tight_layout()
     plt.show()
