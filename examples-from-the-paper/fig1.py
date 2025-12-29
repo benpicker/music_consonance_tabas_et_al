@@ -1,16 +1,36 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Placeholder for the actual loadParameters function
+# Minimal working loadParameters for demo/testing
+# Replace with your actual parameter loading logic as needed
 def loadParameters():
-    # Implement or import your parameter loading logic here
-    pass
+    return {
+        'subDelayDy': 10,
+        'subDelay': 5,
+        'est': {
+            'dur': 200,
+            'type': 'IRNchordSS',
+            'f': 160,
+            'nOfIts': 16,
+            'noiseOff' : 0,
+            'bandpass': [125, 2000],
+            'tuning': 'just',
+            'notes': []
+        }
+    }
 
-# Placeholder for the actual tdoch function
+# Minimal working tdoch for demo/testing
+# Replace with your actual tdoch logic as needed
 def tdoch(pars):
-    # Implement or import your tdoch logic here
-    # Should return s, r, lagSpace, timeSpace
-    pass
+    # Dummy shapes for testing
+    s = {
+        'p': {'He': np.zeros((200, 30)), 'Hi': np.zeros((200, 30))},
+        'q': {'He': np.zeros((200, 30)), 'Hi': np.zeros((200, 30))}
+    }
+    r = {'A': np.zeros((200, 30))}
+    lagSpace = np.linspace(1, 30, 30)
+    timeSpace = np.linspace(0, 1, 200)
+    return s, r, lagSpace, timeSpace
 
 N = 60
 notes = np.arange(0, 13, 1)
