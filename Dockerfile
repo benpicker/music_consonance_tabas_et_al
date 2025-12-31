@@ -30,3 +30,9 @@ RUN pip3 install \
 RUN pip3 install \
     cochlea \
     thorns
+
+# --- set working directory inside container ---
+WORKDIR /workspace
+
+# --- copy entire project into the image ---
+COPY . /workspace
