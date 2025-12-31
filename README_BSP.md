@@ -22,7 +22,16 @@ The file `loadParameters.py` defines and manages parameters for the neural simul
 - Uses the cochlea package to simulate auditory nerve responses to sound (peripheralSpikes and peripheral functions).
 
 
+FOR SAVING THE FILES WITHIN DOCKER 
+1. Make sure `COPY . /workspace` is uncommented in `Dockerfile`. 
+2. Open Docker Desktop 
+3. Build the image by running `docker build -t cochlea-min .` 
+4. Run `docker run --rm -it cochlea-min bash`
 
-1. Open Docker Desktop 
-2. Build the image by running `docker build -t cochlea-min .` 
-3. Run `docker run --rm -it cochlea-min bash`
+
+FOR RUNNIG DOCKER WHILE HAVING THE FILES LOCALLY 
+
+1. Make sure `COPY . /workspace` is commented out in `Dockerfile`. 
+2. Open Docker Desktop 
+3. Build the image by running `docker build -t cochlea-min .` 
+4. Then run `docker run -it -v C:/Users/benpi/Documents/my_repos/music_consonance_tabas_et_al:/workspace cochlea-min` to mount it. 

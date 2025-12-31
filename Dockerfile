@@ -34,5 +34,5 @@ RUN pip3 install \
 # --- set working directory inside container ---
 WORKDIR /workspace
 
-# --- copy entire project into the image ---
-COPY . /workspace
+# --- copy entire project into the image (disabled for local volume mounting) ---
+# COPY . /workspace
