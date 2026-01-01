@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from typing import Any, List
+import os
 
 class Parameters:
     pass
@@ -30,7 +31,13 @@ def plot_connectivities(lagSpace: np.ndarray, Cei: np.ndarray, Cii: np.ndarray, 
     cbar_ax = fig.add_axes([0.88, 0.15, 0.03, 0.7]) # [left, bottom, width, height]
     fig.colorbar(im, cax=cbar_ax)
 
-    plt.show()
+    # Save the plot to a directory specified by the OUTPUT_DIR environment variable, or default to ./sample_outputs
+    output_dir = os.environ.get("OUTPUT_DIR", "./sample_outputs")
+    os.makedirs(output_dir, exist_ok=True)
+    output_path = os.path.join(output_dir, "connectivities.png")
+    plt.savefig(output_path)
+    plt.close(fig)
+    print(f"Plot saved to {output_path}")
 
 def defineStimulus() -> Parameters:
     est = Parameters()

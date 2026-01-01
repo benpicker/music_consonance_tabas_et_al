@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  cochlea:
+    image: cochlea-min
+    environment:
+      - OUTPUT_DIR=/workspace/sample_outputs
+    volumes:
+      - .:/workspace
+      - ./sample_outputs:/workspace/sample_outputs
+    working_dir: /workspace
+    stdin_open: true
+    tty: true
